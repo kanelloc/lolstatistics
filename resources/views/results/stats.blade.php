@@ -133,14 +133,25 @@
                         @foreach($matches as $match)
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="box box-info">
+                                <div class="box box-info collapsed-box {{$match->result == true ? 'box-color-win' : 'box-color-lost' }}">
                                     <div class="box-header with-border">
                                         <div class="row">
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
+                                                @if($match->result == true)
+                                                    <p align="center">Win</p>
+                                                @else
+                                                    <p class="game-result-lost" align="center">Lost</p>
+                                                @endif
+                                                <p align="center">{{$match->gameDuration}}</p>
+                                            </div>
+                                            <div class="col-md-2">
                                                 <img class='profile-user-img img-responsive img-circle' src="{{url('https://ddragon.leagueoflegends.com/cdn/7.14.1/img/champion/'.$match->champion_name.'.png')}}" alt="Image">
                                             </div>
-                                            <div class="col-md-3">
-                                                <h3 class="box-title">{{$match->gameId}}</h3>
+                                            <div class="col-md-2">
+                                                <h4 align="center">{{$match->stats['kills']}}/{{$match->stats['deaths']}}/{{$match->stats['assists']}}
+                                                </h4>
+                                                <p align="center">{{$match->stats['KDA']}}:1 KDA</p>
+
                                             </div>
                                         </div>
                                         <div class="box-tools pull-right">

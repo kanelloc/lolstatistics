@@ -93,7 +93,7 @@ class HomeController extends Controller
 
     public function postSearch(Request $request)
     {
-        $apikey = 'RGAPI-cb54b49a-efe2-453a-a428-6b870ad95ad7';
+        $apikey = 'RGAPI-a56d9ff4-ca72-4695-a95c-a241fdc7489a';
         $search_outpout = rawurlencode(ucfirst($request->input('usernameSearch')));
         $json_response_summoner = file_get_contents('https://eun1.api.riotgames.com/lol/summoner/v3/summoners/by-name/'.$search_outpout.'?api_key='.$apikey);
         $json_to_array = json_decode($json_response_summoner);
@@ -153,12 +153,45 @@ class HomeController extends Controller
 
             $json_response_match_details    =   file_get_contents('https://eun1.api.riotgames.com/lol/match/v3/matches/'.$match->gameId.'?locale=en_US&api_key='.$apikey);
             $json_to_array_match_details    =   json_decode($json_response_match_details);
+
             $summoner_stats                 =   $json_to_array_match_details->participantIdentities;
+            $participants                   =   $json_to_array_match_details->participants;
+            $teams                          =   $json_to_array_match_details->teams;
+
+            $match->gameDuration            =   gmdate("i:s",$json_to_array_match_details->gameDuration);
+            $match->stats    =    array();
+
             foreach ($summoner_stats as $stats) {
                 if ($stats->player->summonerName == $user_name) {
                     $match->summoner_score_id   =   $stats->participantId;
                 }
             }
+
+            foreach ($participants as $participant) {
+                if ($participant->participantId == $match->summoner_score_id) {
+                    $match->teamId              =   $participant->teamId;
+                    $match->result              =   $participant->stats->win;
+                    $match->kills               =   $participant->stats->kills;
+                    $match->stats['kills']      =   $participant->stats->kills; 
+                    $match->stats['deaths']     =   $participant->stats->deaths;
+                    $match->stats['assists']    =   $participant->stats->assists;
+
+                    if ($match->stats['deaths'] == 0) {
+                        $match->stats['KDA']        =   round($match->stats['kills'] + $match->stats['assists'], 2);
+                    } else {
+                        $match->stats['KDA']        =   round(($match->stats['kills'] + $match->stats['assists'])/$match->stats['deaths'], 2);
+                    }
+                    $match->firstSpell  =   $participant->spell1Id;
+                    $match->secondSpell =   $participant->spell2Id;
+                    
+                }
+            }
+
+            // foreach ($teams as $team) {
+            //     if ($match->teamId  ==  $team->teamId) {
+            //         $match->result = $team->win;
+            //     }
+            // }
                 
         }
         var_dump($matches);

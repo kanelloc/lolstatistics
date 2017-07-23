@@ -5,5 +5,16 @@
 // Variables
 @import "variables";
 
-// Bootstrap
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+.box-color-lost{
+    background-color: #e2b6b3;
+    border-color: #cea7a7;
+}
+
+.box-color-win{
+    background-color: #9fdf9f;
+}
+
+.game-result-lost{
+    color: #c6443e;
+}
+

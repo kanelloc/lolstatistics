@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ URL::asset('css/AdminLTE.min.css')}}">
     <link rel="stylesheet" href="{{ URL::asset('css/skin-blue.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="/css/app.css">
     <title>Leauge of legends Statistics</title>
 </head>
 <body class="hold-transition skin-blue layout-top-nav">
