@@ -25,7 +25,8 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        "files": ["app/Http/helpers.php"]
     },
     "scripts": {
         "post-root-package-install": [

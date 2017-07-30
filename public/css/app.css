@@ -7,7 +7,25 @@
   background-color: #9fdf9f;
 }
 
+.box-color-remake {
+  background-color: #9a9a9a;
+}
+
 .game-result-lost {
   color: #c6443e;
+}
+
+.item {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
+.no-item {
+  background-color: #8d8787;
+  opacity: 0.5;
 }
 

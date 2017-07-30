@@ -3,84 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Helper;
 
 class HomeController extends Controller
 {
-    //Helper Functions----------------------------------------
-    public function imageTier($tier, $rank)
-    {
-        if ($tier == 'BRONZE') {
-            if ($rank == 'V') {
-                $image_url = 'bronze_v.png';
-            }
-            elseif ($rank == 'IV') {
-                $image_url = 'bronze_iv.png';
-            }
-            elseif ($rank == 'III') {
-                $image_url = 'bronze_iii.png';
-            }
-            elseif ($rank == 'II') {
-                $image_url = 'bronze_ii.png';
-            }
-            elseif ($rank == 'I') {
-                $image_url = 'bronze_i.png';
-            }
-        }
-        elseif ($tier == 'SILVER') {
-            if ($rank == 'V') {
-                $image_url = 'silver_v.png';
-            }
-            elseif ($rank == 'IV') {
-                $image_url = 'silver_iv.png';
-            }
-            elseif ($rank == 'III') {
-                $image_url = 'silver_iii.png';
-            }
-            elseif ($rank == 'II') {
-                $image_url = 'silver_ii.png';
-            }
-            elseif ($rank == 'I') {
-                $image_url = 'silver_i.png';
-            }
-        }
-        elseif ($tier == 'GOLD') {
-            if ($rank == 'V') {
-                $image_url = 'gold_v.png';
-            }
-            elseif ($rank == 'IV') {
-                $image_url = 'gold_iv.png';
-            }
-            elseif ($rank == 'III') {
-                $image_url = 'gold_iii.png';
-            }
-            elseif ($rank == 'II') {
-                $image_url = 'gold_ii.png';
-            }
-            elseif ($rank == 'I') {
-                $image_url = 'gold_i.png';
-            }
-        }
-        elseif ($tier == 'PLATINUM') {
-            if ($rank == 'V') {
-                $image_url = 'platinum_v.png';
-            }
-            elseif ($rank == 'IV') {
-                $image_url = 'platinum_iv.png';
-            }
-            elseif ($rank == 'III') {
-                $image_url = 'platinum_iii.png';
-            }
-            elseif ($rank == 'II') {
-                $image_url = 'platinum_ii.png';
-            }
-            elseif ($rank == 'I') {
-                $image_url = 'platinum_i.png';
-            }
-        }
-
-        return $image_url;
-    }
-    //~-------------------------------------------------------
     public function index()
     {
         return view('index');
@@ -93,7 +19,7 @@ class HomeController extends Controller
 
     public function postSearch(Request $request)
     {
-        $apikey = 'RGAPI-a56d9ff4-ca72-4695-a95c-a241fdc7489a';
+        $apikey = 'RGAPI-f3476246-ff04-459c-b3c8-5928a856beb5';
         $search_outpout = rawurlencode(ucfirst($request->input('usernameSearch')));
         $json_response_summoner = file_get_contents('https://eun1.api.riotgames.com/lol/summoner/v3/summoners/by-name/'.$search_outpout.'?api_key='.$apikey);
         $json_to_array = json_decode($json_response_summoner);
@@ -138,8 +64,8 @@ class HomeController extends Controller
         $win_rate_flex      =   round(($wins_flex / $total_games_flex)*100,2); 
         $lost_rate_flex     =   round(($losses_flex / $total_games_flex)*100,2); 
 
-        $imagesrc_solo = $this->imageTier($tier_solo, $rank_solo);
-        $imagesrc_flex = $this->imageTier($tier_flex, $rank_flex);
+        $imagesrc_solo = Helper::imageTier2($tier_solo, $rank_solo);
+        $imagesrc_flex = Helper::imageTier2($tier_flex, $rank_flex);
 
         //Matches section-----------------------------------------------------
         $matches    =    $json_to_array_matchlist->matches;
@@ -153,14 +79,27 @@ class HomeController extends Controller
 
             $json_response_match_details    =   file_get_contents('https://eun1.api.riotgames.com/lol/match/v3/matches/'.$match->gameId.'?locale=en_US&api_key='.$apikey);
             $json_to_array_match_details    =   json_decode($json_response_match_details);
-
-            $summoner_stats                 =   $json_to_array_match_details->participantIdentities;
+            //exclude arams and custom games--------------------
+            // if ($json_to_array_match_details->gameType == "MATCHED_GAME" && $json_to_array_match_details->gameMode != "ARAM") {
+            //     $summoner_stats                 =   $json_to_array_match_details->participantIdentities;
+            // }
+            if ($json_to_array_match_details->queueId == 420 || $json_to_array_match_details->queueId == 440) {
+                $summoner_stats                 =   $json_to_array_match_details->participantIdentities;
+            }
+            //--------------------------------------------------
             $participants                   =   $json_to_array_match_details->participants;
             $teams                          =   $json_to_array_match_details->teams;
-
+            $match->durationInt             =   $json_to_array_match_details->gameDuration;
             $match->gameDuration            =   gmdate("i:s",$json_to_array_match_details->gameDuration);
             $match->stats    =    array();
-
+            $match->items    =    array();
+            if ($match->durationInt < 300) {
+                $match->remakeFlag = True;
+            } else {
+                $match->remakeFlag = False;
+            }
+            
+            //-----------test----------------------------------
             foreach ($summoner_stats as $stats) {
                 if ($stats->player->summonerName == $user_name) {
                     $match->summoner_score_id   =   $stats->participantId;
@@ -175,6 +114,13 @@ class HomeController extends Controller
                     $match->stats['kills']      =   $participant->stats->kills; 
                     $match->stats['deaths']     =   $participant->stats->deaths;
                     $match->stats['assists']    =   $participant->stats->assists;
+                    $match->items[]             =   $participant->stats->item0;
+                    $match->items[]             =   $participant->stats->item1;
+                    $match->items[]             =   $participant->stats->item2;
+                    $match->items[]             =   $participant->stats->item3;
+                    $match->items[]             =   $participant->stats->item4;
+                    $match->items[]             =   $participant->stats->item5;
+                    $match->items[]             =   $participant->stats->item6;
 
                     if ($match->stats['deaths'] == 0) {
                         $match->stats['KDA']        =   round($match->stats['kills'] + $match->stats['assists'], 2);
@@ -194,7 +140,7 @@ class HomeController extends Controller
             // }
                 
         }
-        var_dump($matches);
+        // var_dump($matches);
         //~-------------------------------------------------------------------
 
         

@@ -133,15 +133,33 @@
                         @foreach($matches as $match)
                         <div class="row">
                             <div class="col-md-12">
+                                @if($match->remakeFlag == true)
+                                <div class="box box-info collapsed-box box-color-remake">
+                                @else
                                 <div class="box box-info collapsed-box {{$match->result == true ? 'box-color-win' : 'box-color-lost' }}">
+                                @endif
                                     <div class="box-header with-border">
                                         <div class="row">
                                             <div class="col-md-2">
-                                                @if($match->result == true)
-                                                    <p align="center">Win</p>
-                                                @else
-                                                    <p class="game-result-lost" align="center">Lost</p>
+                                                @if($match->queue == 420)
+                                                    <p align="center">Ranked Solo</p>
+                                                @elseif($match->queue == 440)
+                                                    <p align="center">Ranked Flex</p>
+                                                @elseif($match->queue == 65)
+                                                    <p align="center">ARAM</p>
+                                                @elseif($match->queue == 32)
+                                                    <p align="center">NORMAL</p>
+                                                @elseif($match->queue == 0)
+                                                    <p align="center">Custom</p>
                                                 @endif
+                                                @if($match->remakeFlag == false && $match->result == true)
+                                                    <p align="center">Win</p>
+                                                @elseif($match->remakeFlag == false && $match->result == false)
+                                                    <p class="game-result-lost" align="center">Lost</p>
+                                                @else
+                                                    <p align="center">Remake</p>
+                                                @endif
+                                                <hr>
                                                 <p align="center">{{$match->gameDuration}}</p>
                                             </div>
                                             <div class="col-md-2">
@@ -152,6 +170,48 @@
                                                 </h4>
                                                 <p align="center">{{$match->stats['KDA']}}:1 KDA</p>
 
+                                            </div>
+                                            <div class="col-md-2">
+                                                <p align="center">{{$match->gameId}}</p>
+                                                <p align="center">{{$match->queue}}</p>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        @if($match->items[0] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[0].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                        @if($match->items[3] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[3].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        @if($match->items[1] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[1].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                        @if($match->items[4] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[4].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        @if($match->items[2] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[2].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                        @if($match->items[5] == 0)
+                                                            <div class="item no-item"></div>
+                                                        @else
+                                                            <img src="{{url('http://ddragon.leagueoflegends.com/cdn/6.24.1/img/item/'.$match->items[5].'.png')}}" alt="" class="item">
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="box-tools pull-right">
